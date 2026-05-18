@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Mensalidades - Grupo Escoteiro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { text-align: center; color: #1e3d59; margin-bottom: 25px; }
+        label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background-color: #17b890; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #139d7a; }
+        .resultado { margin-top: 25px; padding: 20px; border-radius: 6px; background-color: #e8f4f8; display: none; }
+        .status-pago { color: #2e7d32; font-weight: bold; }
+        .status-pendente { color: #c62828; font-weight: bold; }
+        .historico-item { border-bottom: 1px solid #ddd; padding: 10px 0; display: flex; justify-content: space-between; }
+        .historico-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Consulta de Mensalidades</h2>
+    
+    <label for="numRegistro">Número do Registro (com hífen):</label>
+    <input type="text" id="numRegistro" placeholder="Ex: 123456-7">
+
+    <label for="primeiroNome">Primeiro Nome do Associado:</label>
+    <input type="text" id="primeiroNome" placeholder="Ex: Ana">
+
+    <button onclick="consultarMensalidade()">Consultar Situação</button>
+
+    <div id="resultado" class="resultado">
+        <h3 id="resNome">Olá!</h3>
+        <p><strong>Status do Mês Atual:</strong> <span id="resStatus"></span></p>
+        <p><strong>Valor para pagamento hoje:</strong> <span id="resValor"></span></p>
+        <small id="AvisoPrazo" style="color: #666; display: block; margin-top: -10px; margin-bottom: 15px;"></small>
+        
+        <h4>Histórico de Pagamentos Recentes:</h4>
+        <div id="historicoLista"></div>
+    </div>
+</div>
+
+<script>
+// 1. BASE DE DADOS INTEGRADA (Criada a partir das suas tabelas)
+const associados = [
+    { registro: "145236-2", primeiroNome: "ana", nomeCompleto: "Ana Rosa Possobom Sozzi", categoria: "regular", filhos: 1 },
+    { registro: "178954-1", primeiroNome: "antônio", nomeCompleto: "Antônio Miguel Beggi de Oliveira", categoria: "voluntario", filhos: 2 },
+    { registro: "122344-5", primeiroNome: "beatriz", nomeCompleto: "Beatriz Borges Correia", categoria: "voluntario", filhos: 2 },
+    { registro: "165432-9", primeiroNome: "eduardo", nomeCompleto: "Eduardo Leal Antkiewicz", categoria: "pioneiro", filhos: 1 }
+];
+
+const pagamentos = [
+    { nome: "Ana Rosa Possobom Sozzi", mes: "Março", pago: 51.00 },
+    { nome: "Ana Rosa Possobom Sozzi", mes: "Abril", pago: 51.00 },
+    { nome: "Ana Rosa Possobom Sozzi", mes: "Maio", pago: 51.00 },
+    { nome: "Antônio Miguel Beggi de Oliveira", mes: "Março", pago: 41.50 },
+    { nome: "Antônio Miguel Beggi de Oliveira", mes: "Abril", pago: 41.50 },
+    { nome: "Beatriz Borges Correia", mes: "Março", pago: 41.50 },
+    { nome: "Eduardo Leal Antkiewicz", mes: "Março", pago: 12.00 },
+    { nome: "Eduardo Leal Antkiewicz", mes: "Abril", pago: 12.00 }
+];
+
+// TABELA DE PREÇOS (Sua regra de negócios exata)
+const tabelaPrecos = {
+    regular: {
+        1: { hoje: 51.00, apos: 65.00 },
+        2: { hoje: 83.00, apos: 107.00 },
+        3: { hoje: 106.00, apos: 138.00 }
+    },
+    voluntario: {
+        1: { hoje: 45.90, apos: 51.00 },
+        2: { hoje: 66.40, apos: 83.00 },
+        3: { hoje: 74.20, apos: 106.00 }
+    },
+    pioneiro: {
+        1: { hoje: 12.00, apos: 15.00 }
+    }
+};
+
+function consultarMensalidade() {
+    const registroInput = document.getElementById('numRegistro').value.trim();
+    const nomeInput = document.getElementById('primeiroNome').value.trim().toLowerCase();
+    
+    // Busca o associado combinando Registro E Primeiro Nome
+    const associadoEncontrado = associados.find(a => a.registro === registroInput && a.primeiroNome === nomeInput);
+    
+    if (!associadoEncontrado) {
+        alert("Associado não encontrado. Verifique o número do registro e o nome informados.");
+        return;
+    }
+
+    // Regra do Dia 10 (Desconto de Pontualidade)
+    const hoje = new Date();
+    const diaAtual = hoje.getDate();
+    
+    const categoria = associadoEncontrado.categoria;
+    const qtdFilhos = associadoEncontrado.filhos;
+    
+    let precosPredefinidos = tabelaPrecos[categoria][qtdFilhos] || tabelaPrecos[categoria][1];
+    
+    let valorCobrado = precosPredefinidos.hoje;
+    let aviso = "*Valor com desconto de pontualidade aplicado (Válido até o dia 10).";
+
+    if (diaAtual > 10) {
+        valorCobrado = precosPredefinidos.apos;
+        aviso = "*Atenção: Prazo do desconto encerrado. Valor atualizado pós dia 10.";
+    }
+
+    // Filtra o histórico de mensalidades já pagas
+    const historicoFiltrado = pagamentos.filter(p => p.nome === associadoEncontrado.nomeCompleto);
+    
+    // Mês atual do sistema
+    const mesesAno = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const mesAtualNome = mesesAno[hoje.getMonth()];
+    
+    const pagouMesAtual = historicoFiltrado.some(p => p.mes.toLowerCase() === mesAtualNome.toLowerCase());
+
+    // Mostra o resultado na tela
+    document.getElementById('resNome').innerText = `Olá, responsável por ${associadoEncontrado.nomeCompleto}!`;
+    document.getElementById('AvisoPrazo').innerText = aviso;
+    
+    if (pagouMesAtual) {
+        document.getElementById('resStatus').innerText = `PAGO em ${mesAtualNome}`;
+        document.getElementById('resStatus').className = "status-pago";
+        document.getElementById('resValor').innerText = "R$ 0,00 (Mensalidade em dia!)";
+    } else {
+        document.getElementById('resStatus').innerText = `PENDENTE referente a ${mesAtualNome}`;
+        document.getElementById('resStatus').className = "status-pendente";
+        document.getElementById('resValor').innerText = `R$ ${valorCobrado.toFixed(2).replace('.', ',')}`;
+    }
+
+    // Lista os meses anteriores pagos
+    let historicoHTML = "";
+    historicoFiltrado.forEach(p => {
+        historicoHTML += `<div class="historico-item"><span>${p.mes}</span><span class="status-pago">Pago (R$ ${p.pago.toFixed(2).replace('.', ',')})</span></div>`;
+    });
+    
+    if(historicoFiltrado.length === 0) { historicoHTML = "<p>Nenhum pagamento registrado neste período.</p>"; }
+    document.getElementById('historicoLista').innerHTML = historicoHTML;
+    document.getElementById('resultado').style.display = "block";
+}
+</script>
+
+</body>
+</html>
