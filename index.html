@@ -657,7 +657,7 @@ const dadosEscoteiros = {
             { mes: "Março", valor: "R$ 0,01", status: "Isento" },
             { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
             { mes: "Maio", valor: "R$ 41,50", status: "Pago" },
-            { mes: "Junho", valor: "R; 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
             { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
             { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
             { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
@@ -794,7 +794,6 @@ const dadosEscoteiros = {
 };
 
 function buscarStatus() {
-    // Pega os primeiros 7 caracteres numéricos do input
     let digitado = document.getElementById("registroInput").value.trim().replace(/[^0-9]/g, "");
     if (digitado.length > 7) {
         digitado = digitado.substring(0, 7);
