@@ -5,142 +5,788 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Mensalidades - Grupo Escoteiro</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { text-align: center; color: #1e3d59; margin-bottom: 25px; }
-        label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background-color: #17b890; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
-        button:hover { background-color: #139d7a; }
-        .resultado { margin-top: 25px; padding: 20px; border-radius: 6px; background-color: #e8f4f8; display: none; }
-        .status-pago { color: #2e7d32; font-weight: bold; }
-        .status-pendente { color: #c62828; font-weight: bold; }
-        .historico-item { border-bottom: 1px solid #ddd; padding: 10px 0; display: flex; justify-content: space-between; }
-        .historico-item:last-child { border-bottom: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border-top: 8px solid #1e5631;
+        }
+        h2 {
+            color: #1e5631;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #444;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #1e5631;
+            outline: none;
+        }
+        button {
+            background-color: #1e5631;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #143d22;
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            text-align: left;
+            display: none;
+        }
+        .result-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #1e5631;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        .month-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .month-row:last-child {
+            border-bottom: none;
+        }
+        .status-pago {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .status-pendente {
+            color: #c62828;
+            font-weight: bold;
+        }
+        .error-msg {
+            color: #c62828;
+            background-color: #ffebee;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Consulta de Mensalidades</h2>
+    <h2>Consulta de Mensalidades ⚜️</h2>
+    <p class="subtitle">Digite o registro do associado para verificar a situação financeira individual.</p>
     
-    <label for="numRegistro">Número do Registro (com hífen):</label>
-    <input type="text" id="numRegistro" placeholder="Ex: 123456-7">
-
-    <label for="primeiroNome">Primeiro Nome do Associado:</label>
-    <input type="text" id="primeiroNome" placeholder="Ex: Ana">
-
-    <button onclick="consultarMensalidade()">Consultar Situação</button>
-
-    <div id="resultado" class="resultado">
-        <h3 id="resNome">Olá!</h3>
-        <p><strong>Status do Mês Atual:</strong> <span id="resStatus"></span></p>
-        <p><strong>Valor para pagamento hoje:</strong> <span id="resValor"></span></p>
-        <small id="AvisoPrazo" style="color: #666; display: block; margin-top: -10px; margin-bottom: 15px;"></small>
-        
-        <h4>Histórico de Pagamentos Recentes:</h4>
-        <div id="historicoLista"></div>
+    <div class="form-group">
+        <label for="registroInput">Número do Registro (com hífen):</label>
+        <input type="text" id="registroInput" placeholder="Ex: 1558613 - 8">
+    </div>
+    
+    <button onclick="buscarStatus()">Consultar Situação</button>
+    
+    <div id="errorBox" class="error-msg">Associado não encontrado. Verifique o número do registro e tente novamente.</div>
+    
+    <div id="resultBox" class="result-box">
+        <div id="nomeAssociado" class="result-title"></div>
+        <div id="listaMeses"></div>
     </div>
 </div>
 
 <script>
-// 1. BASE DE DADOS INTEGRADA (Criada a partir das suas tabelas)
-const associados = [
-    { registro: "145236-2", primeiroNome: "ana", nomeCompleto: "Ana Rosa Possobom Sozzi", categoria: "regular", filhos: 1 },
-    { registro: "178954-1", primeiroNome: "antônio", nomeCompleto: "Antônio Miguel Beggi de Oliveira", categoria: "voluntario", filhos: 2 },
-    { registro: "122344-5", primeiroNome: "beatriz", nomeCompleto: "Beatriz Borges Correia", categoria: "voluntario", filhos: 2 },
-    { registro: "165432-9", primeiroNome: "eduardo", nomeCompleto: "Eduardo Leal Antkiewicz", categoria: "pioneiro", filhos: 1 }
-];
-
-const pagamentos = [
-    { nome: "Ana Rosa Possobom Sozzi", mes: "Março", pago: 51.00 },
-    { nome: "Ana Rosa Possobom Sozzi", mes: "Abril", pago: 51.00 },
-    { nome: "Ana Rosa Possobom Sozzi", mes: "Maio", pago: 51.00 },
-    { nome: "Antônio Miguel Beggi de Oliveira", mes: "Março", pago: 41.50 },
-    { nome: "Antônio Miguel Beggi de Oliveira", mes: "Abril", pago: 41.50 },
-    { nome: "Beatriz Borges Correia", mes: "Março", pago: 41.50 },
-    { nome: "Eduardo Leal Antkiewicz", mes: "Março", pago: 12.00 },
-    { nome: "Eduardo Leal Antkiewicz", mes: "Abril", pago: 12.00 }
-];
-
-// TABELA DE PREÇOS (Sua regra de negócios exata)
-const tabelaPrecos = {
-    regular: {
-        1: { hoje: 51.00, apos: 65.00 },
-        2: { hoje: 83.00, apos: 107.00 },
-        3: { hoje: 106.00, apos: 138.00 }
+// Banco de dados embutido a partir da planilha fornecida
+const dadosEscoteiros = {
+    "1558613 - 8": {
+        nome: "Ana Rosa Possobom Sozzi",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
     },
-    voluntario: {
-        1: { hoje: 45.90, apos: 51.00 },
-        2: { hoje: 66.40, apos: 83.00 },
-        3: { hoje: 74.20, apos: 106.00 }
+    "1615943 - 8": {
+        nome: "Antônio Miguel Beggi de Oliveira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
     },
-    pioneiro: {
-        1: { hoje: 12.00, apos: 15.00 }
+    "1625839 - 8": {
+        nome: "Beatriz Borges Correia",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1506449 - 2": {
+        nome: "Benjamin Luca Henriques",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1468095 - 5": {
+        nome: "Bia Hirami Balarotti",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1468106 - 4": {
+        nome: "Cecília Beggi de Oliveira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1593383 - 0": {
+        nome: "Eduarda Fernandes dos Santos",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1011684 - 2": {
+        nome: "Eduardo Leal Antkiewicz",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1530575 - 9": {
+        nome: "Eduardo Machado Bruzon",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1607153 - 0": {
+        nome: "Elena Fernandes dos Santos",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "905326 - 3": {
+        nome: "Erick Daniel Henklein",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1011680 - 0": {
+        nome: "Fernando Leal Antkiewicz",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1558616 - 2": {
+        nome: "Gabriel Lima Ferreira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1189476 - 8": {
+        nome: "Gabriela Chinato Pagnoncelli",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1524524 - 1": {
+        nome: "Gabrielle Loeser de Assunção",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1524521 - 7": {
+        nome: "Geovanna Loeser de Assunção",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1648540 - 8": {
+        nome: "Heitor Rodrigues Panstein",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pago" },
+            { mes: "Junho", status: "Pago" },
+            { mes: "Julho", status: "Pago" },
+            { mes: "Agosto", status: "Pago" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pago" },
+            { mes: "Novembro", status: "Pago" }
+        ]
+    },
+    "1625837 - 1": {
+        nome: "Heloisa Braun",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1585275 - 0": {
+        nome: "Heloisa Silva dos Santos",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1534533 - 5": {
+        nome: "Jasmine Ferreira Sanches dos Santos",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1563030 - 7": {
+        nome: "João Guilherme Chamulera Job",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1648685 - 4": {
+        nome: "João Rubens de Camargo Santos",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1189474 - 1": {
+        nome: "Julia Chinato Pagnoncelli",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1461446 - 4": {
+        nome: "Lucas Borges Correia",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1558611 - 1": {
+        nome: "Malu Hannyer Marques Rodrigues",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "832082 - 9": {
+        nome: "Manoela Garcia Muniz de Resende",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pago" },
+            { mes: "Junho", status: "Pago" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pago" },
+            { mes: "Setembro", status: "Pago" },
+            { mes: "Outubro", status: "Pago" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1477371 - 6": {
+        nome: "Maria Clara Salvadego Guiotti",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1638167 - 0": {
+        nome: "Maria Isadora Gonçalves Pereira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1453611 - 0": {
+        nome: "Mariana Hardt Parucker e Silva",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1011682 - 6": {
+        nome: "Mariana Leal Antkiewicz",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1586073 - 6": {
+        nome: "Melissa de Camargo Santos",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1638169 - 6": {
+        nome: "Miguel Figueiredo Libonati Rocha Ferreira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1523027 - 9": {
+        nome: "Pedro Henrique Nadalin Garcia",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1401706 - 7": {
+        nome: "Poliana Hardt Parucker e Silva",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pago" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1511970 - 0": {
+        nome: "Thiago Romanine Fantinatto",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pago" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1585271 - 7": {
+        nome: "Valentina Braun",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1251283 - 4": {
+        nome: "Valentina Kroska de Lara",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pago" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1263855 - 2": {
+        nome: "Vinicius Salvadego",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1468101 - 3": {
+        nome: "Vítor Canova de Barcelos Costa",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1263861 - 7": {
+        nome: "Vitor Salvadego",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pendente" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1524525 - 0": {
+        nome: "Vitória Felix da Silva",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1657706 - 0": {
+        nome: "Gustavo Vasconcellos Teixeira",
+        meses: [
+            { mes: "Março", status: "Pago" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
+    },
+    "1676464 - 1": {
+        nome: "Enzo Nadalin Garcia",
+        meses: [
+            { mes: "Março", status: "Pendente" },
+            { mes: "Abril", status: "Pago" },
+            { mes: "Maio", status: "Pendente" },
+            { mes: "Junho", status: "Pendente" },
+            { mes: "Julho", status: "Pendente" },
+            { mes: "Agosto", status: "Pendente" },
+            { mes: "Setembro", status: "Pendente" },
+            { mes: "Outubro", status: "Pendente" },
+            { mes: "Novembro", status: "Pendente" }
+        ]
     }
 };
 
-function consultarMensalidade() {
-    const registroInput = document.getElementById('numRegistro').value.trim();
-    const nomeInput = document.getElementById('primeiroNome').value.trim().toLowerCase();
+function buscarStatus() {
+    const registro = document.getElementById("registroInput").value.trim();
+    const resultBox = document.getElementById("resultBox");
+    const errorBox = document.getElementById("errorBox");
+    const nomeAssociado = document.getElementById("nomeAssociado");
+    const listaMeses = document.getElementById("listaMeses");
     
-    // Busca o associado combinando Registro E Primeiro Nome
-    const associadoEncontrado = associados.find(a => a.registro === registroInput && a.primeiroNome === nomeInput);
+    // Esconde resultados anteriores
+    resultBox.style.display = "none";
+    errorBox.style.display = "none";
+    listaMeses.innerHTML = "";
     
-    if (!associadoEncontrado) {
-        alert("Associado não encontrado. Verifique o número do registro e o nome informados.");
-        return;
-    }
-
-    // Regra do Dia 10 (Desconto de Pontualidade)
-    const hoje = new Date();
-    const diaAtual = hoje.getDate();
-    
-    const categoria = associadoEncontrado.categoria;
-    const qtdFilhos = associadoEncontrado.filhos;
-    
-    let precosPredefinidos = tabelaPrecos[categoria][qtdFilhos] || tabelaPrecos[categoria][1];
-    
-    let valorCobrado = precosPredefinidos.hoje;
-    let aviso = "*Valor com desconto de pontualidade aplicado (Válido até o dia 10).";
-
-    if (diaAtual > 10) {
-        valorCobrado = precosPredefinidos.apos;
-        aviso = "*Atenção: Prazo do desconto encerrado. Valor atualizado pós dia 10.";
-    }
-
-    // Filtra o histórico de mensalidades já pagas
-    const historicoFiltrado = pagamentos.filter(p => p.nome === associadoEncontrado.nomeCompleto);
-    
-    // Mês atual do sistema
-    const mesesAno = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-    const mesAtualNome = mesesAno[hoje.getMonth()];
-    
-    const pagouMesAtual = historicoFiltrado.some(p => p.mes.toLowerCase() === mesAtualNome.toLowerCase());
-
-    // Mostra o resultado na tela
-    document.getElementById('resNome').innerText = `Olá, responsável por ${associadoEncontrado.nomeCompleto}!`;
-    document.getElementById('AvisoPrazo').innerText = aviso;
-    
-    if (pagouMesAtual) {
-        document.getElementById('resStatus').innerText = `PAGO em ${mesAtualNome}`;
-        document.getElementById('resStatus').className = "status-pago";
-        document.getElementById('resValor').innerText = "R$ 0,00 (Mensalidade em dia!)";
+    if (dadosEscoteiros[registro]) {
+        const jovem = dadosEscoteiros[registro];
+        nomeAssociado.innerText = "👦 Jovem: " + jovem.nome;
+        
+        jovem.meses.forEach(function(item) {
+            const row = document.createElement("div");
+            row.className = "month-row";
+            
+            const nomeMes = document.createElement("span");
+            nomeMes.innerText = item.mes;
+            
+            const statusMes = document.createElement("span");
+            if (item.status === "Pago") {
+                statusMes.innerText = "✅ Pago";
+                statusMes.className = "status-pago";
+            } else {
+                statusMes.innerText = "⏳ Pendente";
+                statusMes.className = "status-pendente";
+            }
+            
+            row.appendChild(nomeMes);
+            row.appendChild(statusMes);
+            listaMeses.appendChild(row);
+        });
+        
+        resultBox.style.display = "block";
     } else {
-        document.getElementById('resStatus').innerText = `PENDENTE referente a ${mesAtualNome}`;
-        document.getElementById('resStatus').className = "status-pendente";
-        document.getElementById('resValor').innerText = `R$ ${valorCobrado.toFixed(2).replace('.', ',')}`;
+        errorBox.style.display = "block";
     }
-
-    // Lista os meses anteriores pagos
-    let historicoHTML = "";
-    historicoFiltrado.forEach(p => {
-        historicoHTML += `<div class="historico-item"><span>${p.mes}</span><span class="status-pago">Pago (R$ ${p.pago.toFixed(2).replace('.', ',')})</span></div>`;
-    });
-    
-    if(historicoFiltrado.length === 0) { historicoHTML = "<p>Nenhum pagamento registrado neste período.</p>"; }
-    document.getElementById('historicoLista').innerHTML = historicoHTML;
-    document.getElementById('resultado').style.display = "block";
 }
 </script>
 
