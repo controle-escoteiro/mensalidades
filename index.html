@@ -148,16 +148,16 @@
 
 <div class="container">
     <h2>Consulta de Mensalidades ⚜️</h2>
-    <p class="subtitle">Digite o registro do associado para verificar os valores e a situação financeira individual.</p>
+    <p class="subtitle">Digite o número do registro do associado para verificar a situação individual.</p>
     
     <div class="form-group">
         <label for="registroInput">Número do Registro:</label>
-        <input type="text" id="registroInput" placeholder="Ex: 1558613 - 8">
+        <input type="text" id="registroInput" placeholder="Ex: 1558613">
     </div>
     
     <button onclick="buscarStatus()">Consultar Situação</button>
     
-    <div id="errorBox" class="error-msg">Associado não encontrado. Verifique o número do registro e tente novamente.</div>
+    <div id="errorBox" class="error-msg">Associado não encontrado. Verifique o número e tente novamente.</div>
     
     <div id="resultBox" class="result-box">
         <div id="nomeAssociado" class="result-title"></div>
@@ -777,7 +777,11 @@ const dadosEscoteiros = {
 };
 
 function buscarStatus() {
-    const registroDigitado = document.getElementById("registroInput").value.trim().replace(/[\s-]/g, "");
+    // Pega o valor digitado e extrai apenas os números fundamentais (ex: os 7 primeiros) antes de qualquer traço ou espaço
+    let digitado = document.getElementById("registroInput").value.trim().replace(/[\s-]/g, "");
+    if (digitado.length > 7) {
+        digitado = digitado.substring(0, 7);
+    }
     
     const resultBox = document.getElementById("resultBox");
     const errorBox = document.getElementById("errorBox");
@@ -790,7 +794,11 @@ function buscarStatus() {
     
     let chaveEncontrada = null;
     for (const chave in dadosEscoteiros) {
-        if (chave.replace(/[\s-]/g, "") === registroDigitado) {
+        let chaveBase = chave.replace(/[\s-]/g, "");
+        if (chaveBase.length > 7) {
+            chaveBase = chaveBase.substring(0, 7);
+        }
+        if (chaveBase === digitado && digitado !== "") {
             chaveEncontrada = chave;
             break;
         }
@@ -798,7 +806,7 @@ function buscarStatus() {
     
     if (chaveEncontrada) {
         const jovem = dadosEscoteiros[chaveEncontrada];
-        nomeAssociado.innerText = "👦 Jovem: " + jovem.nome;
+        nomeAssociado.innerText = "⚜️ Associado: " + jovem.nome;
         
         jovem.meses.forEach(function(item) {
             const row = document.createElement("div");
