@@ -657,7 +657,7 @@ const dadosEscoteiros = {
             { mes: "Março", valor: "R$ 0,01", status: "Isento" },
             { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
             { mes: "Maio", valor: "R$ 41,50", status: "Pago" },
-            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R; 41,50", status: "Pendente" },
             { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
             { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
             { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
@@ -794,7 +794,8 @@ const dadosEscoteiros = {
 };
 
 function buscarStatus() {
-    let digitado = document.getElementById("registroInput").value.trim().replace(/[\s-]/g, "");
+    // Pega os primeiros 7 caracteres numéricos do input
+    let digitado = document.getElementById("registroInput").value.trim().replace(/[^0-9]/g, "");
     if (digitado.length > 7) {
         digitado = digitado.substring(0, 7);
     }
@@ -808,13 +809,18 @@ function buscarStatus() {
     errorBox.style.display = "none";
     listaMeses.innerHTML = "";
     
+    if (!digitado) {
+        errorBox.style.display = "block";
+        return;
+    }
+    
     let chaveEncontrada = null;
     for (const chave in dadosEscoteiros) {
-        let chaveBase = chave.replace(/[\s-]/g, "");
+        let chaveBase = chave.replace(/[^0-9]/g, "");
         if (chaveBase.length > 7) {
             chaveBase = chaveBase.substring(0, 7);
         }
-        if (chaveBase === digitado && digitado !== "") {
+        if (chaveBase === digitado) {
             chaveEncontrada = chave;
             break;
         }
