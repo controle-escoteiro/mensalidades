@@ -22,7 +22,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             padding: 30px;
             width: 100%;
-            max-width: 500px;
+            max-width: 555px;
             text-align: center;
             border-top: 8px solid #1e5631;
         }
@@ -90,14 +90,36 @@
             border-bottom: 2px solid #eee;
             padding-bottom: 5px;
         }
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #666;
+            font-size: 13px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
         .month-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px dashed #eee;
+            font-size: 15px;
         }
         .month-row:last-child {
             border-bottom: none;
+        }
+        .month-name {
+            flex: 2;
+        }
+        .month-val {
+            flex: 1.5;
+            color: #555;
+        }
+        .month-status-container {
+            flex: 2;
+            text-align: right;
         }
         .status-pago {
             color: #2e7d32;
@@ -105,6 +127,10 @@
         }
         .status-pendente {
             color: #c62828;
+            font-weight: bold;
+        }
+        .status-isento {
+            color: #1565c0;
             font-weight: bold;
         }
         .error-msg {
@@ -122,7 +148,7 @@
 
 <div class="container">
     <h2>Consulta de Mensalidades ⚜️</h2>
-    <p class="subtitle">Digite o registro do associado para verificar a situação financeira individual.</p>
+    <p class="subtitle">Digite o registro do associado para verificar os valores e a situação financeira individual.</p>
     
     <div class="form-group">
         <label for="registroInput">Número do Registro (com hífen):</label>
@@ -135,613 +161,617 @@
     
     <div id="resultBox" class="result-box">
         <div id="nomeAssociado" class="result-title"></div>
+        <div class="month-header">
+            <span style="flex: 2;">Mês</span>
+            <span style="flex: 1.5;">Valor</span>
+            <span style="flex: 2; text-align: right;">Situação</span>
+        </div>
         <div id="listaMeses"></div>
     </div>
 </div>
 
 <script>
-// Banco de dados embutido a partir da planilha fornecida
 const dadosEscoteiros = {
     "1558613 - 8": {
         nome: "Ana Rosa Possobom Sozzi",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1615943 - 8": {
         nome: "Antônio Miguel Beggi de Oliveira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1625839 - 8": {
         nome: "Beatriz Borges Correia",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1506449 - 2": {
         nome: "Benjamin Luca Henriques",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1468095 - 5": {
         nome: "Bia Hirami Balarotti",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1468106 - 4": {
         nome: "Cecília Beggi de Oliveira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1593383 - 0": {
         nome: "Eduarda Fernandes dos Santos",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "1011684 - 2": {
         nome: "Eduardo Leal Antkiewicz",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1530575 - 9": {
         nome: "Eduardo Machado Bruzon",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1607153 - 0": {
         nome: "Elena Fernandes dos Santos",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "905326 - 3": {
         nome: "Erick Daniel Henklein",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1011680 - 0": {
         nome: "Fernando Leal Antkiewicz",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "1558616 - 2": {
         nome: "Gabriel Lima Ferreira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Isento" }
         ]
     },
     "1189476 - 8": {
         nome: "Gabriela Chinato Pagnoncelli",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1524524 - 1": {
         nome: "Gabrielle Loeser de Assunção",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1524521 - 7": {
         nome: "Geovanna Loeser de Assunção",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1648540 - 8": {
         nome: "Heitor Rodrigues Panstein",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pago" },
-            { mes: "Junho", status: "Pago" },
-            { mes: "Julho", status: "Pago" },
-            { mes: "Agosto", status: "Pago" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pago" },
-            { mes: "Novembro", status: "Pago" }
+            { mes: "Março", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pago" }
         ]
     },
     "1625837 - 1": {
         nome: "Heloisa Braun",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1585275 - 0": {
         nome: "Heloisa Silva dos Santos",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1534533 - 5": {
         nome: "Jasmine Ferreira Sanches dos Santos",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1563030 - 7": {
         nome: "João Guilherme Chamulera Job",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Isento" }
         ]
     },
     "1648685 - 4": {
         nome: "João Rubens de Camargo Santos",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "1189474 - 1": {
         nome: "Julia Chinato Pagnoncelli",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1461446 - 4": {
         nome: "Lucas Borges Correia",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1558611 - 1": {
         nome: "Malu Hannyer Marques Rodrigues",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "832082 - 9": {
         nome: "Manoela Garcia Muniz de Resende",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pago" },
-            { mes: "Junho", status: "Pago" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pago" },
-            { mes: "Setembro", status: "Pago" },
-            { mes: "Outubro", status: "Pago" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1477371 - 6": {
         nome: "Maria Clara Salvadego Guiotti",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1638167 - 0": {
         nome: "Maria Isadora Gonçalves Pereira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 42,90", status: "Pago" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1453611 - 0": {
         nome: "Mariana Hardt Parucker e Silva",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Isento" }
         ]
     },
     "1011682 - 6": {
         nome: "Mariana Leal Antkiewicz",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pago" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "1586073 - 6": {
         nome: "Melissa de Camargo Santos",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 33,20", status: "Isento" },
+            { mes: "Junho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 33,20", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 33,20", status: "Pendente" }
         ]
     },
     "1638169 - 6": {
         nome: "Miguel Figueiredo Libonati Rocha Ferreira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Abril", valor: "R$ 45,90", status: "Pago" },
+            { mes: "Maio", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 45,90", status: "Isento" },
+            { mes: "Julho", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 45,90", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 45,90", status: "Pendente" }
         ]
     },
     "1523027 - 9": {
         nome: "Pedro Henrique Nadalin Garcia",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Abril", valor: "R$ 35,33", status: "Pago" },
+            { mes: "Maio", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 35,33", status: "Isento" },
+            { mes: "Setembro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 35,33", status: "Pendente" }
         ]
     },
     "1401706 - 7": {
         nome: "Poliana Hardt Parucker e Silva",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pago" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 41,50", status: "Isento" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1511970 - 0": {
         nome: "Thiago Romanine Fantinatto",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pago" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 35,33", status: "Isento" },
+            { mes: "Abril", valor: "R$ 35,33", status: "Pago" },
+            { mes: "Maio", valor: "R$ 35,33", status: "Pago" },
+            { mes: "Junho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 35,33", status: "Pendente" }
         ]
     },
     "1585271 - 7": {
         nome: "Valentina Braun",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 41,50", status: "Pago" },
+            { mes: "Maio", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 41,50", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 41,50", status: "Pendente" }
         ]
     },
     "1251283 - 4": {
         nome: "Valentina Kroska de Lara",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pago" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Isento" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1263855 - 2": {
         nome: "Vinicius Salvadego",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1468101 - 3": {
         nome: "Vítor Canova de Barcelos Costa",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1263861 - 7": {
         nome: "Vitor Salvadego",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pendente" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1524525 - 0": {
         nome: "Vitória Felix da Silva",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 12,00", status: "Pago" },
+            { mes: "Junho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 12,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 12,00", status: "Pendente" }
         ]
     },
     "1657706 - 0": {
         nome: "Gustavo Vasconcellos Teixeira",
         meses: [
-            { mes: "Março", status: "Pago" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Abril", valor: "R$ 51,00", status: "Pago" },
+            { mes: "Maio", valor: "R$ 51,00", status: "Isento" },
+            { mes: "Junho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 51,00", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 51,00", status: "Pendente" }
         ]
     },
     "1676464 - 1": {
         nome: "Enzo Nadalin Garcia",
         meses: [
-            { mes: "Março", status: "Pendente" },
-            { mes: "Abril", status: "Pago" },
-            { mes: "Maio", status: "Pendente" },
-            { mes: "Junho", status: "Pendente" },
-            { mes: "Julho", status: "Pendente" },
-            { mes: "Agosto", status: "Pendente" },
-            { mes: "Setembro", status: "Pendente" },
-            { mes: "Outubro", status: "Pendente" },
-            { mes: "Novembro", status: "Pendente" }
+            { mes: "Março", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Abril", valor: "R$ 35,33", status: "Pago" },
+            { mes: "Maio", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Junho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Julho", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Agosto", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Setembro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Outubro", valor: "R$ 35,33", status: "Pendente" },
+            { mes: "Novembro", valor: "R$ 35,33", status: "Pendente" }
         ]
     }
 };
@@ -753,7 +783,6 @@ function buscarStatus() {
     const nomeAssociado = document.getElementById("nomeAssociado");
     const listaMeses = document.getElementById("listaMeses");
     
-    // Esconde resultados anteriores
     resultBox.style.display = "none";
     errorBox.style.display = "none";
     listaMeses.innerHTML = "";
@@ -767,19 +796,32 @@ function buscarStatus() {
             row.className = "month-row";
             
             const nomeMes = document.createElement("span");
+            nomeMes.className = "month-name";
             nomeMes.innerText = item.mes;
+            
+            const valorMes = document.createElement("span");
+            valorMes.className = "month-val";
+            valorMes.innerText = item.valor;
+            
+            const statusContainer = document.createElement("span");
+            statusContainer.className = "month-status-container";
             
             const statusMes = document.createElement("span");
             if (item.status === "Pago") {
                 statusMes.innerText = "✅ Pago";
                 statusMes.className = "status-pago";
+            } else if (item.status === "Isento") {
+                statusMes.innerText = "⭐ Isento";
+                statusMes.className = "status-isento";
             } else {
                 statusMes.innerText = "⏳ Pendente";
                 statusMes.className = "status-pendente";
             }
             
+            statusContainer.appendChild(statusMes);
             row.appendChild(nomeMes);
-            row.appendChild(statusMes);
+            row.appendChild(valorMes);
+            row.appendChild(statusContainer);
             listaMeses.appendChild(row);
         });
         
